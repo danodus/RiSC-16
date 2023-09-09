@@ -3,3 +3,8 @@ out
 formal
 pipelined/sim/obj_dir
 pipelined/sim/code.data
+pipelined/icebreaker/*.asc
+pipelined/icebreaker/*.bin
+pipelined/icebreaker/*.json
+pipelined/icebreaker/*.log
+pipelined/icebreaker/code.data
