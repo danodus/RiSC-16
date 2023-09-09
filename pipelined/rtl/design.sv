@@ -25,8 +25,8 @@ SOFTWARE.
 `ifndef DESIGN_SV
 `define DESIGN_SV
 
-`include "core.v"
-`include "mem_data.v"
+`include "core.sv"
+`include "mem_data.sv"
 
 module toplevel (
     input clk,                  // Global clock
@@ -39,23 +39,23 @@ module toplevel (
     localparam p_DATA_NUM  = 2 ** p_DATA_ADDR_LEN;
     parameter p_CODE_FILE = "code.data";
     
-    reg[15:0] inst_memory[p_INST_NUM-1:0];
+    logic[15:0] inst_memory[p_INST_NUM-1:0];
 
-    reg[15:0] r_display = 16'd0;
+    logic[15:0] r_display = 16'd0;
     assign display = r_display;
 
     initial begin
         $readmemb(p_CODE_FILE, inst_memory);
     end
 
-    wire[15:0] w_rd_data;
-    wire[15:0] w_wr_data;
-    wire[15:0] w_addr;
-    wire w_wr_en;
+    logic[15:0] w_rd_data;
+    logic[15:0] w_wr_data;
+    logic[15:0] w_addr;
+    logic w_wr_en;
 
-    reg[15:0] r_addr_prev;
+    logic[15:0] r_addr_prev;
     
-    always @(posedge clk)
+    always_ff @(posedge clk)
         r_addr_prev <= w_addr;
 
     // The DUT	
@@ -72,7 +72,7 @@ module toplevel (
         .o_mem_wr_en(w_wr_en)
     );
 
-    always @(posedge clk)
+    always_ff @(posedge clk)
         if (w_addr == 16'hFFFF)
             r_display <= w_wr_data;
 

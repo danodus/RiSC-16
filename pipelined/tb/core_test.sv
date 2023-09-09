@@ -65,7 +65,7 @@ module core_test;
 
   	reg[15:0] r_addr_prev;
 	
-  	always @(posedge clk) r_addr_prev <= w_addr;
+  	always_ff @(posedge clk) r_addr_prev <= w_addr;
 	
 	// The DUT	
 	core core_dut (

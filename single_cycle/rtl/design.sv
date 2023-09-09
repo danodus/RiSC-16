@@ -25,8 +25,8 @@ SOFTWARE.
 `ifndef DESIGN_SV
 `define DESIGN_SV
 
-`include "core.v"
-`include "mem_data.v"
+`include "core.sv"
+`include "mem_data.sv"
 
 module toplevel (
     input clk,                  // Global clock

@@ -22,11 +22,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-`ifndef CORE_V
-`define CORE_V
+`ifndef CORE_SV
+`define CORE_SV
 
-`include "mem_reg.v"
-`include "alu.v"
+`include "mem_reg.sv"
+`include "alu.sv"
 
 // Everything except the instruction memory
 module core (
@@ -140,7 +140,7 @@ module core (
     assign w_stall_wb     = r_stall_wb;
 
     // Fetch stall logic
-    always @(*) begin
+    always_comb begin
         // If instruction was JALR or BEQ
         if(w_opcode_fetch == JALR 
         || w_opcode_fetch == BEQ)
@@ -149,7 +149,7 @@ module core (
             r_stall_fetch = 1'b0;
     end
     // Decode stall logic
-    always @(*) begin
+    always_comb begin
         // If instruction was BEQ
         if(r_opcode_decode == BEQ)
             r_stall_decode = 1'b1;
@@ -157,7 +157,7 @@ module core (
             r_stall_decode = 1'b0;
     end
     // Execute stall logic
-    always @(*) begin
+    always_comb begin
         // LW with data hazard with next instruction
         if(r_opcode_exec == LW 
                 && r_tgt_exec !== 0 
@@ -182,7 +182,7 @@ module core (
 
     assign o_pc_next = r_pc_curr;
 
-    always @(*) begin
+    always_comb begin
         // BEQ after execute stage
         if(r_opcode_exec == BEQ)
             if(r_result_eq_exec)
@@ -198,7 +198,7 @@ module core (
     end
 
     // Instruction (including stall)
-  	always @(posedge i_clk) if(i_rst) begin
+  	always_ff @(posedge i_clk) if(i_rst) begin
         r_pc            <= 0;
         r_pc_fetch      <= 0;
         r_instn_fetch   <= 0;
@@ -251,7 +251,7 @@ module core (
   	wire[15:0] w_limm_ext_decode = {w_limm_decode, {6{1'b0}}};
 
     // Decide the source and destination addresses
-    always @(*) begin
+    always_comb begin
         case(w_opcode_fetch)
             ADD: begin
                 r_tgt_next      = w_rega_decode;
@@ -318,7 +318,7 @@ module core (
         .i_wr_en(r_valid_mem)               // High to write on posedge
     );
 
-    always @(posedge i_clk) begin
+    always_ff @(posedge i_clk) begin
         // Stall
         if(w_stall_exec) begin
             r_valid_decode       <= r_valid_decode;
@@ -369,7 +369,7 @@ module core (
     wire        w_alueq;
 
     // Forward values for operand 1
-    always @(*) begin
+    always_comb begin
         if(r_src1_decode == 0)
             r_operand1_fwd = 0;
         else begin
@@ -387,7 +387,7 @@ module core (
         end
     end
     // Forward values for operand 2
-    always @(*) begin
+    always_comb begin
       	if(r_src2_decode == 0)
             r_operand2_fwd = 0;
         else begin
@@ -406,7 +406,7 @@ module core (
     end
 
     // Decide the operation and sources for the ALU
-    always @(*) begin
+    always_comb begin
         case(r_opcode_decode)
             ADD: begin
                 r_aluop    = 1'b0;
@@ -461,7 +461,7 @@ module core (
         .o_eq(w_alueq)         // Were both inputs equal?
     );
 
-    always @(posedge i_clk) begin
+    always_ff @(posedge i_clk) begin
         // Stall
         if(w_stall_mem) begin
             r_valid_exec        <= r_valid_exec;
@@ -505,7 +505,7 @@ module core (
     assign o_mem_wr_data    = r_swdata_exec;
     assign o_mem_wr_en      = (r_opcode_exec == SW);
 
-    always @(posedge i_clk) begin
+    always_ff @(posedge i_clk) begin
         // Stall
         if(w_stall_wb) begin
             r_valid_mem         <= r_valid_mem;
@@ -542,7 +542,7 @@ module core (
     // instantiation itself, in the decode stage. Only job here is
     // to define the pipeline register flow!
 
-    always @(posedge i_clk) begin
+    always_ff @(posedge i_clk) begin
         // Create bubble
         if(r_stall_wb) begin
             r_valid_wb          <= 0;
@@ -571,7 +571,7 @@ module core (
 
     integer f_i;
 
-    always @(*) begin
+    always_comb begin
         f_pipe_opcodes[0] = w_opcode_fetch;
         f_pipe_opcodes[1] = r_opcode_decode;
         f_pipe_opcodes[2] = r_opcode_exec;
@@ -615,7 +615,7 @@ module core (
         f_pipe_tgt[4] = r_tgt_wb;
     end
 
-    always @(posedge i_clk) begin
+    always_ff @(posedge i_clk) begin
         if(f_past_valid) begin
             // Bubbles must move up the pipeline every cycle
             for(f_i = 0; f_i < 4; f_i = f_i + 1)
@@ -636,7 +636,7 @@ module core (
         f_past_valid = 1;
     end
 
-    always @(*) begin
+    always_comb begin
         // Check for bubbles in the pipeline
         for(f_i = 0; f_i < 5; f_i = f_i + 1) begin
             if(f_pipe_opcodes[f_i] == BEQ) begin

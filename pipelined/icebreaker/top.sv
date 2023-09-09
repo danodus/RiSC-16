@@ -24,7 +24,7 @@ module top(
     assign auto_reset = auto_reset_counter < 5'b11111;
     assign reset = auto_reset || !BTN_N;
 
-	always @(posedge CLK) begin
+	always_ff @(posedge CLK) begin
         auto_reset_counter <= auto_reset_counter + auto_reset;
 	end
 

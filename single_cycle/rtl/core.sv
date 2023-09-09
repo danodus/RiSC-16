@@ -22,10 +22,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-`ifndef CORE_V
-`define CORE_V
+`ifndef CORE_SV
+`define CORE_SV
 
-`include "mem_reg.v"
+`include "mem_reg.sv"
 
 // Everything except the instruction memory
 module core (
@@ -98,7 +98,7 @@ module core (
     wire[15:0] w_sign_imm_ext = {{25{w_sign_imm[6]}}, w_sign_imm};
 
     // Get register mapping (from instruction to register file)
-    always @(*) begin
+    always_comb begin
         case(opcode)
             ADD: begin
                 r_tgt_addr     = w_rega;
@@ -144,7 +144,7 @@ module core (
     end
 
     // Set register and memory control signals
-    always @(*) begin
+    always_comb begin
         case(opcode)
             ADD: begin
                 r_tgt_in    <= w_reg1_out + w_reg2_out;
@@ -221,7 +221,7 @@ module core (
         endcase
     end
 
-    always @(posedge i_clk) begin
+    always_ff @(posedge i_clk) begin
         if(i_rst) begin
           o_pc = 0;
         end

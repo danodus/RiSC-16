@@ -6,11 +6,11 @@ depth 10
 smtbmc boolector
 
 [script]
-read -formal core.v
+read -formal core.sv
 prep -top core
 
 [files]
-rtl/mem_reg.v
-rtl/core.v
-rtl/mem_data.v
-rtl/alu.v
+rtl/mem_reg.sv
+rtl/core.sv
+rtl/mem_data.sv
+rtl/alu.sv

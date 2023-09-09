@@ -22,8 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-`ifndef MEM_DATA_V
-`define MEM_DATA_V
+`ifndef MEM_DATA_SV
+`define MEM_DATA_SV
 
 // Data memory
 module mem_data #(
@@ -40,10 +40,10 @@ module mem_data #(
 );
 
     // Truncated address bus
-  	wire[$clog2(p_MEM_SIZE)-1:0] w_addr_trunc = i_addr[$clog2(p_MEM_SIZE)-1:0];
+  	logic[$clog2(p_MEM_SIZE)-1:0] w_addr_trunc = i_addr[$clog2(p_MEM_SIZE)-1:0];
 
     // Memory array
-	reg[p_WORD_LEN-1:0] r_memory[p_MEM_SIZE-1:0];
+	logic[p_WORD_LEN-1:0] r_memory[p_MEM_SIZE-1:0];
 
     integer i;
 
@@ -54,7 +54,7 @@ module mem_data #(
         end
     end
 
-  	always @(posedge i_clk) begin
+  	always_ff @(posedge i_clk) begin
         // Write to memory
         if(i_wr_en)
             r_memory[w_addr_trunc]   <= i_wr_data;
@@ -63,17 +63,17 @@ module mem_data #(
     end
 
 `ifdef FORMAL
-    (* anyconst *) reg[p_ADDR_LEN-1:0] f_test_addr;
-    reg[p_WORD_LEN-1:0] f_test_data = 0;
-    reg f_past_valid = 0;
+    (* anyconst *) logic[p_ADDR_LEN-1:0] f_test_addr;
+    logic[p_WORD_LEN-1:0] f_test_data = 0;
+    logic f_past_valid = 0;
 
-    always @(*) begin
+    always_comb begin
         // Memory location test
         assert(r_memory[f_test_addr] == f_test_data);
 
     end
 
-    always @(posedge i_clk) begin
+    always_ff @(posedge i_clk) begin
         // Output data test
         if(f_past_valid && $past(i_addr) == f_test_addr)
             assert(o_rd_data == $past(f_test_data));        

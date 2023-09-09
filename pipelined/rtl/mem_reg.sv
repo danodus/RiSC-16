@@ -22,8 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-`ifndef MEM_REG_V
-`define MEM_REG_V
+`ifndef MEM_REG_SV
+`define MEM_REG_SV
 
 module mem_reg #(
     parameter p_WORD_LEN        = 16,
@@ -44,45 +44,49 @@ module mem_reg #(
 );
 
     // Memory
-    reg [p_WORD_LEN-1:0] r_memory[p_REG_FILE_SIZE-1:1];
+    logic [p_WORD_LEN-1:0] r_memory[p_REG_FILE_SIZE-1:0];
     
     // For iteration
     integer i;
 
-    // Outputs
-  	assign o_src1_data = (i_src1 === 0) ? 0 : r_memory[i_src1];
-  	assign o_src2_data = (i_src2 === 0) ? 0 : r_memory[i_src2];
+  	assign o_src1_data = r_memory[i_src1];
+  	assign o_src2_data = r_memory[i_src2];
 
     // Initial values are 0
     initial begin
-      for(i = 1; i < p_REG_FILE_SIZE; i = i + 1)
-            r_memory[i] <= 0;
+      for(i = 0; i < p_REG_FILE_SIZE; i = i + 1)
+            r_memory[i] = 0;
     end
 
     // Write on posedge
-  	always @(posedge i_clk) begin : write_block
+  	always_ff @(posedge i_clk) begin : write_block
         if(i_wr_en)
             if(i_tgt != 0)
                 r_memory[i_tgt] = i_tgt_data;
     end
-            
+
 `ifdef FORMAL
+`ifndef CORE_V
 
     // Test some register by tracking its value
-    (* anyconst *) reg[p_REG_ADDR_LEN-1:0] f_test_reg;
-    reg[p_WORD_LEN-1:0] f_test_val = 0;
+    (* anyconst *) logic[p_REG_ADDR_LEN-1:0] f_test_reg;
+    logic[p_WORD_LEN-1:0] f_test_val = 0;
+
+    logic f_past_valid = 0;
     
-    always @(*) begin
+    always_comb begin
         // Test register must not be 0!
         assume(f_test_reg !== 0);
     
         // Track memory
         assert(r_memory[f_test_reg] == f_test_val);
 
+        assert(r_memory[0] == 0);
+
         // Outputs must never be indeterminate
         assert(^o_src1_data !== 1'bx);
         assert(^o_src1_data !== 1'bx);
-
+            
         // Reading 0 must always give 0
         if(i_src1 == 0)
             assert(o_src1_data == 0);
@@ -96,12 +100,15 @@ module mem_reg #(
             assert(o_src2_data == f_test_val);
     end
 
-    always @(posedge i_clk) begin
+    always_ff @(posedge i_clk) begin
         // Writing to test register
         if(i_tgt == f_test_reg && i_wr_en)
             f_test_val <= i_tgt_data;
+
+        f_past_valid = 1;
     end
 
+`endif
 `endif
 
 endmodule

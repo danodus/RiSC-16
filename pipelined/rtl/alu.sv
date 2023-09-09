@@ -22,8 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-`ifndef ALU_V
-`define ALU_V
+`ifndef ALU_SV
+`define ALU_SV
 
 module alu #(
     parameter p_WORD_LEN = 16

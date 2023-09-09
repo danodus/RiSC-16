@@ -12,7 +12,7 @@ clean:
 	rm -f code.data
 
 sim: sim_main.cpp
-	$(VERILATOR) --trace -cc --exe $(CFLAGS) $(LDFLAGS) design.v sim_main.cpp -I../rtl
+	$(VERILATOR) --trace -cc --exe $(CFLAGS) $(LDFLAGS) design.sv sim_main.cpp -I../rtl
 	$(MAKE) -j 4 -C obj_dir -f Vdesign.mk
 
 code.data: $(ASMFILE)

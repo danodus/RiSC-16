@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 # Source files used
-sources 		= rtl/core.v rtl/design.v rtl/mem_data.v rtl/mem_reg.v
+sources 		= rtl/core.sv rtl/design.sv rtl/mem_data.sv rtl/mem_reg.sv
 
 # Testbench code
 testbench	= tb/testbench.sv

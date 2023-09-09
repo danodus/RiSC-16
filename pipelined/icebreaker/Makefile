@@ -7,11 +7,11 @@ DEVICE := up5k
 PACKAGE := sg48
 
 PIN_DEF := icebreaker.pcf
-SRC := 	../rtl/alu.v \
-		../rtl/core.v \
-		../rtl/design.v \
-		../rtl/mem_data.v \
-		../rtl/mem_reg.v \
+SRC := 	../rtl/alu.sv \
+		../rtl/core.sv \
+		../rtl/design.sv \
+		../rtl/mem_data.sv \
+		../rtl/mem_reg.sv \
 		top.sv
 
 DEFINES :=
