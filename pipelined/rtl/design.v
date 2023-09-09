@@ -30,7 +30,8 @@ SOFTWARE.
 
 module toplevel (
     input clk,                  // Global clock
-    output[15:0] pc
+    output[15:0] pc,
+    output[15:0] display
 );
 
     localparam p_INST_NUM = 1024;
@@ -39,6 +40,9 @@ module toplevel (
     parameter p_CODE_FILE = "code.data";
     
     reg[15:0] inst_memory[p_INST_NUM-1:0];
+
+    reg[15:0] r_display = 16'd0;
+    assign display = r_display;
 
     initial begin
         $readmemb(p_CODE_FILE, inst_memory);
@@ -59,7 +63,7 @@ module toplevel (
         .i_clk(clk),
         .i_rst(0),
 
-        .i_inst(inst_memory[pc]),
+        .i_inst(inst_memory[pc[$clog2(p_INST_NUM)-1:0]]),
         .o_pc_next(pc),
 
         .i_mem_rd_data((r_addr_prev < p_DATA_NUM) ? w_rd_data : 16'b0),
@@ -67,7 +71,11 @@ module toplevel (
         .o_mem_addr(w_addr),
         .o_mem_wr_en(w_wr_en)
     );
-    
+
+    always @(posedge clk)
+        if (w_addr == 16'hFFFF)
+            r_display <= w_wr_data;
+
     mem_data #(
         .p_WORD_LEN(16),
         .p_ADDR_LEN(p_DATA_ADDR_LEN)
@@ -75,7 +83,7 @@ module toplevel (
         .i_clk(clk),
         .i_wr_en(w_wr_en && (w_addr < p_DATA_NUM)),
         
-        .i_addr(w_addr),
+        .i_addr(w_addr[p_DATA_ADDR_LEN-1:0]),
         .o_rd_data(w_rd_data),
         .i_wr_data(w_wr_data)
     );

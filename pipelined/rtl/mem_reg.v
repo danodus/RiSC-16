@@ -55,7 +55,7 @@ module mem_reg #(
     // Initial values are 0
     initial begin
       for(i = 0; i < p_REG_FILE_SIZE; i = i + 1)
-            r_memory[i] <= 0;
+            r_memory[i] = 0;
     end
 
     // Write on posedge

@@ -50,7 +50,7 @@ module mem_data #(
     // Initial memory content is 0
     initial begin
         for (i = 0; i < p_MEM_SIZE; i = i + 1) begin
-                r_memory[i] <= 0;
+                r_memory[i] = 0;
         end
     end
 

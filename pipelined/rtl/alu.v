@@ -26,7 +26,7 @@ SOFTWARE.
 `define ALU_V
 
 module alu #(
-    p_WORD_LEN = 16
+    parameter p_WORD_LEN = 16
 ) (
     input                   i_op,       // 0 for add, 1 for nand
 

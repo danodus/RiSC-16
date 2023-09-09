@@ -186,15 +186,15 @@ module core (
         // BEQ after execute stage
         if(r_opcode_exec == BEQ)
             if(r_result_eq_exec)
-                r_pc_curr    <= r_pc_exec + 1 + r_operand_imm_exec;
+                r_pc_curr    = r_pc_exec + 1 + r_operand_imm_exec;
             else
-                r_pc_curr    <= r_pc_exec + 1;
+                r_pc_curr    = r_pc_exec + 1;
         // JALR after decode stage
         else if(r_opcode_decode == JALR)
-            r_pc_curr    <= r_operand1_fwd;
+            r_pc_curr    = r_operand1_fwd;
         // Any other instruction
         else
-            r_pc_curr    <= r_pc;
+            r_pc_curr    = r_pc;
     end
 
     // Instruction (including stall)
@@ -340,7 +340,7 @@ module core (
             r_opcode_decode      <= ADD;
             r_operand1_decode    <= 0;
             r_operand2_decode    <= 0;
-            r_operand_imm_decode <= 15'b0;
+            r_operand_imm_decode <= 16'b0;
         // Pass through
         end else begin
             r_valid_decode  <= r_valid_fetch;
@@ -371,37 +371,37 @@ module core (
     // Forward values for operand 1
     always @(*) begin
         if(r_src1_decode == 0)
-            r_operand1_fwd <= 0;
+            r_operand1_fwd = 0;
         else begin
             // From EXEC
             if(r_src1_decode == r_tgt_exec)
-                r_operand1_fwd <= r_result_alu_exec;
+                r_operand1_fwd = r_result_alu_exec;
             // From MEM
             else if(r_src1_decode == r_tgt_mem)
-                r_operand1_fwd <= w_result_mem;
+                r_operand1_fwd = w_result_mem;
             // From WB
             else if(r_src1_decode == r_tgt_wb)
-                r_operand1_fwd <= r_result_wb;
+                r_operand1_fwd = r_result_wb;
             else
-                r_operand1_fwd <= r_operand1_decode;
+                r_operand1_fwd = r_operand1_decode;
         end
     end
     // Forward values for operand 2
     always @(*) begin
       	if(r_src2_decode == 0)
-            r_operand2_fwd <= 0;
+            r_operand2_fwd = 0;
         else begin
             // From EXEC
             if(r_src2_decode == r_tgt_exec)
-                r_operand2_fwd <= r_result_alu_exec;
+                r_operand2_fwd = r_result_alu_exec;
             // From MEM
             else if(r_src2_decode == r_tgt_mem)
-                r_operand2_fwd <= w_result_mem;
+                r_operand2_fwd = w_result_mem;
             // From WB
             else if(r_src2_decode == r_tgt_wb)
-                r_operand2_fwd <= r_result_wb;
+                r_operand2_fwd = r_result_wb;
             else
-                r_operand2_fwd <= r_operand2_decode;
+                r_operand2_fwd = r_operand2_decode;
         end
     end
 
