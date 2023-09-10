@@ -31,12 +31,12 @@ module mem_data #(
     parameter p_ADDR_LEN = 10,                  // Number of addressing lines
     localparam p_MEM_SIZE = 2 ** p_ADDR_LEN     // Number of words
 ) (
-    input i_clk,                                // Clock signal
-    input i_wr_en,                              // High to write on positive edge
+    input  wire logic i_clk,                     // Clock signal
+    input  wire logic i_wr_en,                   // High to write on positive edge
 
-    input[p_ADDR_LEN-1:0]        i_addr,        // Address of data
-  	output reg[p_WORD_LEN-1:0]   o_rd_data = 0,   // Data for reading (asynchronous)
-  	input[p_WORD_LEN-1:0]        i_wr_data      // Data for writing (on posedge)
+    input  wire logic [p_ADDR_LEN-1:0]   i_addr,        // Address of data
+  	output      logic [p_WORD_LEN-1:0]   o_rd_data = 0, // Data for reading (asynchronous)
+  	input  wire logic [p_WORD_LEN-1:0]   i_wr_data      // Data for writing (on posedge)
 );
 
     // Truncated address bus

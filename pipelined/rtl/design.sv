@@ -29,9 +29,9 @@ SOFTWARE.
 `include "mem_data.sv"
 
 module toplevel (
-    input clk,                  // Global clock
-    output[15:0] pc,
-    output[15:0] display
+    input  wire logic        clk,                  // Global clock
+    output      logic [15:0] pc,
+    output      logic [15:0] display
 );
 
     localparam p_INST_NUM = 1024;

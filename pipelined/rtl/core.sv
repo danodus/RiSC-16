@@ -31,18 +31,18 @@ SOFTWARE.
 // Everything except the instruction memory
 module core (
     // Control signals
-    input               i_clk,                  // Main clock signal
-    input               i_rst,                  // Global reset
+    input  wire logic             i_clk,                  // Main clock signal
+    input  wire logic             i_rst,                  // Global reset
 
     // Instruction memory interface
-    input[15:0]         i_inst,                 // Instruction input from instruction memory (read is assumed combinational)
-    output[15:0]        o_pc_next,              // Program counter output to instruction memory
+    input  wire logic [15:0]      i_inst,                 // Instruction input from instruction memory (read is assumed combinational)
+    output      logic [15:0]      o_pc_next,              // Program counter output to instruction memory
 
     // Data memory interface
-    input[15:0]         i_mem_rd_data,          // Data read from memory
-    output[15:0]        o_mem_wr_data,          // Data to write to memory
-    output[15:0]        o_mem_addr,             // Address to write or read
-    output              o_mem_wr_en             // Write enable for memory
+    input  wire logic [15:0]      i_mem_rd_data,          // Data read from memory
+    output      logic [15:0]      o_mem_wr_data,          // Data to write to memory
+    output      logic [15:0]      o_mem_addr,             // Address to write or read
+    output      logic             o_mem_wr_en             // Write enable for memory
 );
 
     // Opcodes defined as localparam
@@ -62,56 +62,56 @@ module core (
     // ---------------------------
 
     // Is the instruction here valid (not a bubble)
-    reg r_valid_fetch   = 0;
-    reg r_valid_decode  = 0;
-    reg r_valid_exec    = 0;
-    reg r_valid_mem     = 0;
-    reg r_valid_wb      = 0;
+    logic r_valid_fetch   = 0;
+    logic r_valid_decode  = 0;
+    logic r_valid_exec    = 0;
+    logic r_valid_mem     = 0;
+    logic r_valid_wb      = 0;
 
     // The PC of the instruction (for debugging and branch address computation)
-    reg[15:0] r_pc_fetch        = 0;
-    reg[15:0] r_pc_decode       = 0;
-    reg[15:0] r_pc_exec         = 0;
-    reg[15:0] r_pc_mem          = 0;    // for debugging only
-    reg[15:0] r_pc_wb           = 0;    // for debugging only
+    logic[15:0] r_pc_fetch        = 0;
+    logic[15:0] r_pc_decode       = 0;
+    logic[15:0] r_pc_exec         = 0;
+    logic[15:0] r_pc_mem          = 0;    // for debugging only
+    logic[15:0] r_pc_wb           = 0;    // for debugging only
 
     // Instruction / opcode
-    reg[15:0] r_instn_fetch     = 0;
-    wire[2:0] w_opcode_fetch    = r_instn_fetch[15:13];
-    reg[2:0] r_opcode_decode    = 0;
-    reg[2:0] r_opcode_exec      = 0;
-    reg[2:0] r_opcode_mem       = 0;    // for debugging only
-    reg[2:0] r_opcode_wb        = 0;    // for debugging only
+    logic[15:0] r_instn_fetch     = 0;
+    logic[2:0] w_opcode_fetch    = r_instn_fetch[15:13];
+    logic[2:0] r_opcode_decode    = 0;
+    logic[2:0] r_opcode_exec      = 0;
+    logic[2:0] r_opcode_mem       = 0;    // for debugging only
+    logic[2:0] r_opcode_wb        = 0;    // for debugging only
 
     // Source register addresses
-    reg[2:0] r_src1_decode      = 0;
-    reg[2:0] r_src2_decode      = 0;
+    logic[2:0] r_src1_decode      = 0;
+    logic[2:0] r_src2_decode      = 0;
 
     // Target register addresses
-    reg[2:0] r_tgt_decode       = 0;
-    reg[2:0] r_tgt_exec         = 0;
-    reg[2:0] r_tgt_mem          = 0;
-    reg[2:0] r_tgt_wb           = 0;
+    logic[2:0] r_tgt_decode       = 0;
+    logic[2:0] r_tgt_exec         = 0;
+    logic[2:0] r_tgt_mem          = 0;
+    logic[2:0] r_tgt_wb           = 0;
 
     // ALU operand values
-    reg[15:0] r_operand_imm_decode  = 0;
-    reg[15:0] r_operand_imm_exec    = 0;
-    reg[15:0] r_operand1_decode     = 0;
-    reg[15:0] r_operand2_decode     = 0;
+    logic[15:0] r_operand_imm_decode  = 0;
+    logic[15:0] r_operand_imm_exec    = 0;
+    logic[15:0] r_operand1_decode     = 0;
+    logic[15:0] r_operand2_decode     = 0;
 
     // Forwarded values of operand 1 and 2 into execute stage
-    reg[15:0]   r_operand1_fwd;
-    reg[15:0]   r_operand2_fwd;
+    logic[15:0]   r_operand1_fwd;
+    logic[15:0]   r_operand2_fwd;
 
     // Value to store in MEM stage from ALU stage 
-    reg[15:0]   r_swdata_exec     = 0;
+    logic[15:0]   r_swdata_exec     = 0;
 
     // Result values
-    reg[15:0] r_result_alu_exec = 0;
-    reg[15:0] r_result_alu_mem  = 0;
-    wire[15:0] w_result_mem;        // Result after mem can be from ALU or MEM
-    reg[15:0] r_result_wb       = 0;
-    reg r_result_eq_exec        = 0;
+    logic[15:0] r_result_alu_exec = 0;
+    logic[15:0] r_result_alu_mem  = 0;
+    logic[15:0] w_result_mem;        // Result after mem can be from ALU or MEM
+    logic[15:0] r_result_wb       = 0;
+    logic r_result_eq_exec        = 0;
 
     // ---------------------------
     // Stall signals and stall logic
@@ -120,18 +120,18 @@ module core (
     // ---------------------------
 
     // Stall origins
-    reg r_stall_fetch;
-    reg r_stall_decode;
-    reg r_stall_exec;
-    reg r_stall_mem     = 0;
-    reg r_stall_wb      = 0;
+    logic r_stall_fetch;
+    logic r_stall_decode;
+    logic r_stall_exec;
+    logic r_stall_mem     = 0;
+    logic r_stall_wb      = 0;
 
     // If earlier stages are stalled, then stall this stage too!
-    wire w_stall_fetch;
-    wire w_stall_decode;
-    wire w_stall_exec;
-    wire w_stall_mem;
-    wire w_stall_wb;
+    logic w_stall_fetch;
+    logic w_stall_decode;
+    logic w_stall_exec;
+    logic w_stall_mem;
+    logic w_stall_wb;
 
     assign w_stall_fetch  = r_stall_fetch || w_stall_decode;
     assign w_stall_decode = r_stall_decode || w_stall_exec;
@@ -173,8 +173,8 @@ module core (
     // ---------------------------
     // The next instruction to fetch is stored here.
     // i_inst contains instruction newly fetched in this cycle
-    reg[15:0] r_pc;
-    reg[15:0] r_pc_curr;
+    logic[15:0] r_pc;
+    logic[15:0] r_pc_curr;
 
     initial begin
         r_pc        = 0;
@@ -229,26 +229,36 @@ module core (
     // ---------------------------
     // Get register mapping (from instruction to register file)
 
-    reg[2:0] r_tgt_next;
-    reg[2:0] r_src1_next;
-    reg[2:0] r_src2_next;
-    reg[15:0] r_imm_next;
+    logic[2:0] r_tgt_next;
+    logic[2:0] r_src1_next;
+    logic[2:0] r_src2_next;
+    logic[15:0] r_imm_next;
 
     // Regfile outputs
-    wire[15:0] w_operand1_rd;
-    wire[15:0] w_operand2_rd;
+    logic[15:0] w_operand1_rd;
+    logic[15:0] w_operand2_rd;
 
     // Split the instruction into parts
-    wire[2:0] w_opcode_decode = r_instn_fetch[15:13];
-    wire[2:0] w_rega_decode   = r_instn_fetch[12:10];
-    wire[2:0] w_regb_decode   = r_instn_fetch[9:7];
-    wire[2:0] w_regc_decode   = r_instn_fetch[2:0];
-    wire[9:0] w_limm_decode   = r_instn_fetch[9:0];
-    wire[6:0] w_simm_decode   = r_instn_fetch[6:0];
+    logic[2:0] w_opcode_decode;
+    logic[2:0] w_rega_decode;
+    logic[2:0] w_regb_decode;
+    logic[2:0] w_regc_decode;
+    logic[9:0] w_limm_decode;
+    logic[6:0] w_simm_decode;
+
+    assign w_opcode_decode = r_instn_fetch[15:13];
+    assign w_rega_decode   = r_instn_fetch[12:10];
+    assign w_regb_decode   = r_instn_fetch[9:7];
+    assign w_regc_decode   = r_instn_fetch[2:0];
+    assign w_limm_decode   = r_instn_fetch[9:0];
+    assign w_simm_decode   = r_instn_fetch[6:0];
 
     // Modify signed and long immediate to get actual immediate that will be used
-  	wire[15:0] w_simm_ext_decode = {{9{w_simm_decode[6]}}, w_simm_decode};
-  	wire[15:0] w_limm_ext_decode = {w_limm_decode, {6{1'b0}}};
+  	logic [15:0] w_simm_ext_decode;
+  	logic [15:0] w_limm_ext_decode;
+
+    assign w_simm_ext_decode = {{9{w_simm_decode[6]}}, w_simm_decode};
+    assign w_limm_ext_decode = {w_limm_decode, {6{1'b0}}};
 
     // Decide the source and destination addresses
     always_comb begin
@@ -361,12 +371,12 @@ module core (
     // Execute the operation from fetched operands
     // ---------------------------
 
-    reg         r_aluop;
-    reg[15:0]   r_aluina;
-    reg[15:0]   r_aluinb;
+    logic         r_aluop;
+    logic[15:0]   r_aluina;
+    logic[15:0]   r_aluinb;
     
-    wire[15:0]  w_aluout;
-    wire        w_alueq;
+    logic[15:0]  w_aluout;
+    logic        w_alueq;
 
     // Forward values for operand 1
     always_comb begin
@@ -562,12 +572,12 @@ module core (
 
 `ifdef FORMAL
     // Testing the pipelining and stalling
-    reg[2:0] f_pipe_opcodes[4:0];
-    reg[4:0] f_pipe_bubble;
-    reg[2:0] f_pipe_tgt[4:0];
+    logic[2:0] f_pipe_opcodes[4:0];
+    logic[4:0] f_pipe_bubble;
+    logic[2:0] f_pipe_tgt[4:0];
     
 
-    reg f_past_valid = 0;
+    logic f_past_valid = 0;
 
     integer f_i;
 

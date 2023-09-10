@@ -30,17 +30,17 @@ module mem_reg #(
     parameter p_REG_ADDR_LEN    = 3,
     parameter p_REG_FILE_SIZE   = 8
 ) (
-    input i_clk,                                // Clock signal
+    input  wire logic i_clk,                                // Clock signal
 
-    input[p_REG_ADDR_LEN-1:0]     i_src1,      // Read address 1
-    input[p_REG_ADDR_LEN-1:0]     i_src2,      // Read address 2
-  	input[p_REG_ADDR_LEN-1:0]     i_tgt,       // Write register address
+    input  wire logic [p_REG_ADDR_LEN-1:0]     i_src1,      // Read address 1
+    input  wire logic [p_REG_ADDR_LEN-1:0]     i_src2,      // Read address 2
+  	input  wire logic [p_REG_ADDR_LEN-1:0]     i_tgt,       // Write register address
 
-    output[p_WORD_LEN-1:0]        o_src1_data, // Read output 1 (asynchronous)
-    output[p_WORD_LEN-1:0]        o_src2_data, // Read output 2 (asynchronous)
-    input[p_WORD_LEN-1:0]         i_tgt_data,  // Input to write to the target (on posedge)
+    output      logic [p_WORD_LEN-1:0]         o_src1_data, // Read output 1 (asynchronous)
+    output      logic [p_WORD_LEN-1:0]         o_src2_data, // Read output 2 (asynchronous)
+    input  wire logic [p_WORD_LEN-1:0]         i_tgt_data,  // Input to write to the target (on posedge)
 
-    input i_wr_en                              // High to write on posedge
+    input  wire logic                          i_wr_en      // High to write on posedge
 );
 
     // Memory

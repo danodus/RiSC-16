@@ -28,13 +28,13 @@ SOFTWARE.
 module alu #(
     parameter p_WORD_LEN = 16
 ) (
-    input                   i_op,       // 0 for add, 1 for nand
+    input  wire logic                   i_op,       // 0 for add, 1 for nand
 
-    input[p_WORD_LEN-1:0]   i_ina,      // Input a
-    input[p_WORD_LEN-1:0]   i_inb,      // Input b
+    input  wire logic [p_WORD_LEN-1:0]  i_ina,      // Input a
+    input  wire logic [p_WORD_LEN-1:0]  i_inb,      // Input b
     
-    output[p_WORD_LEN-1:0]  o_out,      // Output
-    output                  o_eq        // Were both inputs equal?
+    output      logic [p_WORD_LEN-1:0]  o_out,      // Output
+    output      logic                   o_eq        // Were both inputs equal?
 );
 
     assign o_eq     = (i_ina == i_inb);
